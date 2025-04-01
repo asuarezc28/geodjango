@@ -1,0 +1,19 @@
+# Ignorar archivos innecesarios para la imagen de Docker
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+*.pot
+*.pyc
+__pycache__
+*.env
+venv/
+env/
+.idea/
+.vscode/
+.DS_Store
+.git/
+.gitignore
+media/

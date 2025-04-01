@@ -1,25 +1,27 @@
-# Entornos virtuales
-venv/
+# Entorno virtual
 env/
+venv/
 
-# Archivos de configuración y caché
-*.pyc
-__pycache__/
-*.sqlite3
-
-# Archivos y carpetas de Django
-*.log
-staticfiles/
-media/
-
-# IDEs y editores
-.vscode/
-.idea/
-.DS_Store
-
-# Archivos de entorno y secretos
+# Archivos de entorno
 .env
 .env.*
 
-# Sistema operativo
-Thumbs.db
+# Archivos de compilación
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Archivos de Django
+*.log
+*.pot
+*.pyc
+*.pyo
+*.db
+*.mo
+
+# Archivos de VS Code
+.vscode/
+
+# Archivos de Docker (si no quieres que suba caché)
+**/__pycache__/
+*.tar

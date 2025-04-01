@@ -14,11 +14,10 @@ if os.name == 'nt':
         os.environ['PATH'] = os.path.join(VENV_BASE, 'Lib', 'site-packages', 'osgeo') + ';' + os.environ['PATH']
         os.environ['PROJ_LIB'] = os.path.join(VENV_BASE, 'Lib', 'site-packages', 'osgeo', 'data', 'proj')
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Seguridad y entorno
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-123456')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-123456')
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
@@ -72,9 +71,10 @@ WSGI_APPLICATION = 'austral_ch_project.wsgi.application'
 
 # Base de datos: usa DATABASE_URL si existe, sino PostGIS local
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f"postgis://postgres:1234@127.0.0.1:5432/austral_ch_project",
-        conn_max_age=600
+    'default': dj_database_url.parse(
+        os.getenv('DATABASE_URL', 'postgres://postgres:1234@localhost:5432/austral_ch_project'),
+        conn_max_age=600,
+        engine='django.contrib.gis.db.backends.postgis'
     )
 }
 
@@ -119,4 +119,5 @@ REST_FRAMEWORK = {
         'user': '1000/day'
     }
 }
+
 
