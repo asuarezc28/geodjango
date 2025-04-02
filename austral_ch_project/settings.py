@@ -121,3 +121,4 @@ REST_FRAMEWORK = {
 }
 
 
+CSRF_TRUSTED_ORIGINS = ['https://web-production-37227.up.railway.app']
