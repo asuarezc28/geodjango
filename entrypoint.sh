@@ -8,5 +8,9 @@ sleep 5
 python manage.py migrate
 python manage.py create_admin
 
+# Recolectar archivos estáticos (para que funcione el admin en producción)
+python manage.py collectstatic --noinput
+
 # Luego levantar gunicorn
 exec gunicorn austral_ch_project.wsgi:application --bind 0.0.0.0:8000
+
