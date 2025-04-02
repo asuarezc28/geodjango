@@ -37,7 +37,6 @@ RUN chmod +x /app/entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 
-COPY staticfiles /app/static
 
 
 
