@@ -29,6 +29,11 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . .
 
+# Ejecutar migraciones y crear superusuario
+RUN python manage.py collectstatic --noinput && \
+    python manage.py migrate && \
+    python manage.py create_admin
+
 # Comando por defecto para ejecutar la aplicación
 CMD gunicorn austral_ch_project.wsgi:application --bind 0.0.0.0:8000
 
