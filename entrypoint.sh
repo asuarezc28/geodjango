@@ -4,26 +4,16 @@
 echo "Esperando a la base de datos..."
 sleep 5
 
-# Ejecutar migraciones y crear superusuario
-python manage.py migrate
-python manage.py create_admin
-
 # Recolectar archivos estáticos (para que funcione el admin en producción)
-python manage.py collectstatic --noinput
-
-# Luego levantar gunicorn
-exec gunicorn austral_ch_project.wsgi:application --bind 0.0.0.0:8000
-
-
-#!/bin/bash
-
 echo ">>> Ejecutando collectstatic..."
 python manage.py collectstatic --noinput
 
+# Aplicar migraciones y crear superusuario
 echo ">>> Aplicando migraciones..."
 python manage.py migrate
 python manage.py create_admin
 
+# Levantar Gunicorn en modo debug para registrar errores
 echo "== Levantando Gunicorn =="
 export DJANGO_SETTINGS_MODULE=austral_ch_project.settings
 export DJANGO_DEBUG=True
