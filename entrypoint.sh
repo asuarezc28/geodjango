@@ -15,6 +15,19 @@ pwd
 echo "Contenido del directorio:"
 ls -la
 
+# Verificar y configurar PostGIS
+echo ">>> Verificando y configurando PostGIS..."
+python manage.py shell -c "
+from django.db import connection
+cursor = connection.cursor()
+try:
+    cursor.execute('CREATE EXTENSION IF NOT EXISTS postgis;')
+    cursor.execute('SELECT PostGIS_version();')
+    print('PostGIS Version:', cursor.fetchone()[0])
+except Exception as e:
+    print('Error al configurar PostGIS:', e)
+"
+
 # Recolectar archivos estáticos
 echo ">>> Ejecutando collectstatic..."
 python manage.py collectstatic --noinput
@@ -23,15 +36,16 @@ python manage.py collectstatic --noinput
 echo ">>> Verificando conexión a la base de datos..."
 python manage.py check
 
-# Verificar que PostGIS está instalado
-echo ">>> Verificando PostGIS..."
-python manage.py shell -c "from django.contrib.gis.db import connections; cursor = connections['default'].cursor(); cursor.execute('SELECT PostGIS_version();'); print(cursor.fetchone()[0])"
-
 # Aplicar migraciones y crear superusuario
 echo ">>> Listando migraciones..."
 python manage.py showmigrations
 
 echo ">>> Aplicando migraciones..."
+# Primero las migraciones de auth
+python manage.py migrate auth --noinput
+# Luego las migraciones de contenttypes
+python manage.py migrate contenttypes --noinput
+# Finalmente todas las demás
 python manage.py migrate --noinput
 
 echo ">>> Creando superusuario..."
