@@ -14,3 +14,15 @@ python manage.py collectstatic --noinput
 # Luego levantar gunicorn
 exec gunicorn austral_ch_project.wsgi:application --bind 0.0.0.0:8000
 
+
+#!/bin/bash
+
+echo ">>> Ejecutando collectstatic..."
+python manage.py collectstatic --noinput
+
+echo ">>> Aplicando migraciones..."
+python manage.py migrate
+python manage.py create_admin
+
+echo ">>> Levantando Gunicorn..."
+exec gunicorn austral_ch_project.wsgi:application --bind 0.0.0.0:8000
