@@ -37,4 +37,9 @@ RUN chmod +x /app/entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 
+# Añadir los archivos recolectados por collectstatic (por si no estaban)
+RUN mkdir -p /app/static
+COPY staticfiles /app/static
+
+
 
