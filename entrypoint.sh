@@ -26,3 +26,8 @@ python manage.py create_admin
 
 echo ">>> Levantando Gunicorn..."
 exec gunicorn austral_ch_project.wsgi:application --bind 0.0.0.0:8000
+
+
+echo "== Ejecutando servidor con DEBUG =="
+export DJANGO_DEBUG=True
+exec gunicorn austral_ch_project.wsgi:application --bind 0.0.0.0:8000 --log-level debug
