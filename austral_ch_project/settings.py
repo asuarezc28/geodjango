@@ -105,8 +105,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Usuario personalizado
-# Usando el modelo de usuario por defecto de Django
-AUTH_USER_MODEL = 'auth.User'
+AUTH_USER_MODEL = 'auth.User'  # Usando el modelo por defecto de Django
+
+# Configuración de autenticación
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Configuración DRF
 REST_FRAMEWORK = {

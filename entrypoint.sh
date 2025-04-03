@@ -52,9 +52,19 @@ except Exception as e:
 echo ">>> Ejecutando collectstatic..."
 python manage.py collectstatic --noinput
 
-echo ">>> Creando y aplicando migraciones..."
-python manage.py makemigrations
-python manage.py migrate
+echo ">>> Creando migraciones iniciales..."
+python manage.py makemigrations contenttypes
+python manage.py makemigrations auth
+python manage.py makemigrations admin
+python manage.py makemigrations sessions
+python manage.py makemigrations chbackend
+
+echo ">>> Aplicando migraciones en orden..."
+python manage.py migrate contenttypes --noinput
+python manage.py migrate auth --noinput
+python manage.py migrate admin --noinput
+python manage.py migrate sessions --noinput
+python manage.py migrate chbackend --noinput
 
 echo ">>> Verificando tablas creadas..."
 python manage.py shell -c "
@@ -62,11 +72,32 @@ from django.db import connection
 cursor = connection.cursor()
 cursor.execute('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\';')
 tables = cursor.fetchall()
-print('Tablas en la base de datos:', [table[0] for table in tables])
+table_names = [table[0] for table in tables]
+print('Tablas en la base de datos:', table_names)
+
+required_tables = ['auth_user', 'django_admin_log', 'auth_permission', 'django_content_type']
+missing_tables = [table for table in required_tables if table not in table_names]
+
+if missing_tables:
+    print('ERROR: Faltan las siguientes tablas:', missing_tables)
+    exit(1)
+print('Todas las tablas requeridas están presentes')
 "
 
 echo ">>> Creando superusuario..."
-python manage.py create_admin
+python manage.py shell -c "
+from django.contrib.auth import get_user_model
+User = get_user_model()
+try:
+    if not User.objects.filter(username='admin').exists():
+        User.objects.create_superuser('admin', 'admin@example.com', 'admin12345')
+        print('Superusuario creado exitosamente')
+    else:
+        print('El superusuario ya existe')
+except Exception as e:
+    print('Error al crear superusuario:', e)
+    exit(1)
+"
 
 echo "=== Iniciando Gunicorn ==="
 exec gunicorn austral_ch_project.wsgi:application \
