@@ -55,33 +55,54 @@ except Exception as e:
 echo ">>> Ejecutando collectstatic..."
 python manage.py collectstatic --noinput
 
-echo ">>> Aplicando migraciones..."
-# Primero las migraciones base
-python manage.py migrate auth --fake-initial
-python manage.py migrate contenttypes --fake-initial
-python manage.py migrate admin --fake-initial
-python manage.py migrate sessions --fake-initial
-
-# Luego todas las migraciones
-python manage.py migrate --fake-initial
-
-echo ">>> Verificando tablas..."
+echo ">>> Creando tablas manualmente..."
 python manage.py shell -c "
 from django.db import connection
 cursor = connection.cursor()
-cursor.execute('''
-    SELECT table_name 
-    FROM information_schema.tables 
-    WHERE table_schema = 'public' 
-    AND table_type = 'BASE TABLE'
-''')
-tables = cursor.fetchall()
-print('Tablas creadas:', [t[0] for t in tables])
 
-if not any('auth_user' in t[0] for t in tables):
-    print('ERROR: Tabla auth_user no encontrada')
-    exit(1)
+# Crear tabla auth_user
+cursor.execute('''
+CREATE TABLE auth_user (
+    id serial PRIMARY KEY,
+    password varchar(128) NOT NULL,
+    last_login timestamp with time zone,
+    is_superuser boolean NOT NULL,
+    username varchar(150) NOT NULL UNIQUE,
+    first_name varchar(150) NOT NULL,
+    last_name varchar(150) NOT NULL,
+    email varchar(254) NOT NULL,
+    is_staff boolean NOT NULL,
+    is_active boolean NOT NULL,
+    date_joined timestamp with time zone NOT NULL
+);
+''')
+
+# Crear tabla django_content_type
+cursor.execute('''
+CREATE TABLE django_content_type (
+    id serial PRIMARY KEY,
+    app_label varchar(100) NOT NULL,
+    model varchar(100) NOT NULL,
+    CONSTRAINT django_content_type_app_label_model_key UNIQUE (app_label, model)
+);
+''')
+
+# Crear tabla auth_permission
+cursor.execute('''
+CREATE TABLE auth_permission (
+    id serial PRIMARY KEY,
+    name varchar(255) NOT NULL,
+    content_type_id integer NOT NULL REFERENCES django_content_type(id),
+    codename varchar(100) NOT NULL,
+    CONSTRAINT auth_permission_content_type_id_codename_key UNIQUE (content_type_id, codename)
+);
+''')
+
+print('Tablas base creadas correctamente')
 "
+
+echo ">>> Aplicando migraciones restantes..."
+python manage.py migrate --no-input
 
 echo ">>> Creando superusuario..."
 python manage.py shell -c "
