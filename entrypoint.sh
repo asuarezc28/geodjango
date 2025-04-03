@@ -32,17 +32,6 @@ do
     sleep 5
 done
 
-# Este bloque es opcional, solo si quieres limpiar todo cada vez (no recomendado para producción)
-# echo ">>> Limpiando schema y reinstalando PostGIS..."
-# python manage.py shell -c "
-# from django.db import connection
-# cursor = connection.cursor()
-# cursor.execute('DROP SCHEMA public CASCADE;')
-# cursor.execute('CREATE SCHEMA public;')
-# cursor.execute('CREATE EXTENSION IF NOT EXISTS postgis;')
-# print('Schema reiniciado y PostGIS listo')
-# "
-
 echo ">>> Ejecutando collectstatic..."
 python manage.py collectstatic --noinput
 
