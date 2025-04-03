@@ -7,6 +7,9 @@ from pathlib import Path
 import os
 import dj_database_url
 
+# Usuario personalizado - DEBE estar antes de INSTALLED_APPS
+AUTH_USER_MODEL = 'auth.User'
+
 # Configuración para GeoDjango en Windows
 if os.name == 'nt':
     VENV_BASE = os.environ.get('VIRTUAL_ENV')
@@ -18,14 +21,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Seguridad y entorno
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-123456')
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+DEBUG = True  # Forzar DEBUG para ver errores
+ALLOWED_HOSTS = ['*']  # Permitir todos los hosts temporalmente
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
+    'django.contrib.auth',  # Mover auth al principio
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.admin',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
@@ -69,11 +72,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'austral_ch_project.wsgi.application'
 
-# Base de datos: usa DATABASE_URL si existe, sino PostGIS local
+# Base de datos simplificada
 DATABASES = {
-    'default': dj_database_url.parse(
-        os.getenv('DATABASE_URL', 'postgres://postgres:1234@localhost:5432/austral_ch_project'),
-        engine='django.contrib.gis.db.backends.postgis'
+    'default': dj_database_url.config(
+        default='postgres://postgres:1234@localhost:5432/austral_ch_project',
+        conn_max_age=0  # Desactivar conexiones persistentes
     )
 }
 
@@ -103,9 +106,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Usuario personalizado
-AUTH_USER_MODEL = 'auth.User'  # Usando el modelo por defecto de Django
 
 # Configuración de autenticación
 AUTHENTICATION_BACKENDS = [
