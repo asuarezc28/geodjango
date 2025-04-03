@@ -17,11 +17,32 @@ if [ -z "$DATABASE_URL" ]; then
     exit 1
 fi
 
+echo ">>> Verificando conexión a la base de datos..."
+python manage.py check
+
 echo ">>> Ejecutando collectstatic..."
 python manage.py collectstatic --noinput
 
 echo ">>> Aplicando migraciones..."
-python manage.py migrate --noinput
+# Primero las migraciones base de Django
+echo ">>> Aplicando migraciones de auth..."
+python manage.py migrate auth --noinput
+echo ">>> Aplicando migraciones de contenttypes..."
+python manage.py migrate contenttypes --noinput
+echo ">>> Aplicando migraciones de admin..."
+python manage.py migrate admin --noinput
+echo ">>> Aplicando migraciones de sessions..."
+python manage.py migrate sessions --noinput
+
+# Verificar que las tablas se crearon
+echo ">>> Verificando tablas creadas..."
+python manage.py shell -c "
+from django.db import connection
+cursor = connection.cursor()
+cursor.execute('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\';')
+tables = cursor.fetchall()
+print('Tablas en la base de datos:', [table[0] for table in tables])
+"
 
 echo ">>> Creando superusuario..."
 python manage.py create_admin
