@@ -15,7 +15,7 @@ from .models import (
 
 
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser  # o donde lo hayas puesto
+# from .models import CustomUser  # Temporalmente comentado
 
 # -----------------------------
 # MODELOS EXISTENTES
@@ -115,9 +115,7 @@ class UserTouristPointVisitAdmin(admin.ModelAdmin):
 
 
 
-@admin.register(CustomUser)
-class CustomUserAdmin(UserAdmin):
-    model = CustomUser
-    fieldsets = UserAdmin.fieldsets + (
-        ('Perfil adicional', {'fields': ('bio', 'avatar')}),
-    )
+# @admin.register(CustomUser)
+# class CustomUserAdmin(UserAdmin):
+#     model = CustomUser
+#     list_display = ['username', 'email', 'is_staff', ]
