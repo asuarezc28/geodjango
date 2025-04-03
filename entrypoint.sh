@@ -51,17 +51,14 @@ except Exception as e:
 echo ">>> Ejecutando collectstatic..."
 python manage.py collectstatic --noinput
 
-echo ">>> Aplicando migraciones en orden..."
-# Primero las migraciones base
-python manage.py migrate contenttypes 0001_initial --noinput
-python manage.py migrate auth 0001_initial --noinput
-python manage.py migrate admin 0001_initial --noinput
-python manage.py migrate sessions 0001_initial --noinput
+echo ">>> Aplicando migraciones iniciales..."
+# Primero las migraciones base de Django
+python manage.py migrate auth --fake-initial
+python manage.py migrate contenttypes --fake-initial
+python manage.py migrate admin --fake-initial
+python manage.py migrate sessions --fake-initial
 
-# Luego las migraciones de la aplicación
-python manage.py migrate chbackend --noinput
-
-# Finalmente, cualquier otra migración pendiente
+# Ahora las migraciones reales
 python manage.py migrate --noinput
 
 echo ">>> Verificando tablas creadas..."
