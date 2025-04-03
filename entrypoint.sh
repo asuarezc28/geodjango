@@ -41,7 +41,8 @@ cursor = connection.cursor()
 try:
     cursor.execute('DROP SCHEMA public CASCADE;')
     cursor.execute('CREATE SCHEMA public;')
-    print('Schema reiniciado correctamente')
+    cursor.execute('CREATE EXTENSION IF NOT EXISTS postgis;')
+    print('Schema reiniciado correctamente y PostGIS instalado')
 except Exception as e:
     print('Error al reiniciar schema:', e)
     exit(1)
@@ -50,8 +51,18 @@ except Exception as e:
 echo ">>> Ejecutando collectstatic..."
 python manage.py collectstatic --noinput
 
-echo ">>> Forzando todas las migraciones..."
-python manage.py migrate --noinput --run-syncdb
+echo ">>> Aplicando migraciones en orden..."
+# Primero las migraciones base
+python manage.py migrate contenttypes 0001_initial --noinput
+python manage.py migrate auth 0001_initial --noinput
+python manage.py migrate admin 0001_initial --noinput
+python manage.py migrate sessions 0001_initial --noinput
+
+# Luego las migraciones de la aplicación
+python manage.py migrate chbackend --noinput
+
+# Finalmente, cualquier otra migración pendiente
+python manage.py migrate --noinput
 
 echo ">>> Verificando tablas creadas..."
 python manage.py shell -c "
